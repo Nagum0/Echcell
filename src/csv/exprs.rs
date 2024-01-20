@@ -128,7 +128,7 @@ fn func_sum<'a>(csv: &'a CSV, args: &'a [Token]) -> Result<f64, CsvError> {
     Ok(range_values.iter().try_fold(0.0, |acc, item| {
         match item.parse::<f64>() {
             Ok(val) => Ok(acc + val),
-            Err(_) => Err(CsvError::NullError), 
+            Err(_) => Err(CsvError::ExprError("NaN".to_string())), 
         }
     })?)
 }

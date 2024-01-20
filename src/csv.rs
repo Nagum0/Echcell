@@ -44,7 +44,7 @@ impl CSV {
         // Splitting file into lines:
         let lines: Vec<String> = match fs::read_to_string(file_path) {
             Ok(contents) => contents.lines().map(String::from).collect(),
-            Err(_) => return Err(CsvError::FileParseError),
+            Err(_) => return Err(CsvError::FileError("Could not read csv file...".to_string())),
         };
 
         // Splitting lines by commas:
@@ -140,13 +140,13 @@ pub fn generate_output(csv: &CSV) -> Result<(), CsvError> {
     // Creating output file:
     let mut output_file = match fs::File::create(format!("out_{}", csv.file)) {
         Ok(f) => f,
-        Err(_) => return Err(CsvError::FileOutputError),
+        Err(_) => return Err(CsvError::FileError("Could not create output file...".to_string())),
     };
     
     // Writing the header to the output file:
     match writeln!(&mut output_file, "{}", csv.header.join(",")) {
         Ok(_)  => {},
-        Err(_) => return Err(CsvError::FileOutputError),
+        Err(_) => return Err(CsvError::FileError("Could not write to output file...".to_string())),
     }
 
     // Writing the body and evaluating the expressions:
@@ -154,7 +154,7 @@ pub fn generate_output(csv: &CSV) -> Result<(), CsvError> {
         let buffer: String = row.iter().map(|item| eval(item, &csv)).collect::<Vec<_>>().join(",");
         match writeln!(&mut output_file, "{}", buffer) {
             Ok(_)  => Ok(()),
-            Err(_) => return Err(CsvError::FileOutputError),
+            Err(_) => return Err(CsvError::FileError("Could not write to output file...".to_string())),
         }
     })
 }

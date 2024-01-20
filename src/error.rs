@@ -3,10 +3,9 @@ use std::error;
 
 #[derive(Debug)]
 pub enum CsvError {
-    FileParseError,
-    FileOutputError,
+    FileError(String),
     ArgError,
-    NullError,
+    ExprError(String),
     RangeError(String),
     CellPError(String),
 }
@@ -14,10 +13,9 @@ pub enum CsvError {
 impl fmt::Display for CsvError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::FileParseError  => write!(f, "#[FILE ERROR] Could not parse csv file..."),
-            Self::FileOutputError => write!(f, "#[FILE ERROR] Could not write to output file..."),
-            Self::ArgError        => write!(f, "#[ARG ERROR] Incorrect argument amount..."),
-            Self::NullError       => write!(f, "#[NULL]"),
+            Self::FileError(msg)  => write!(f, "#[FILE ERROR] {}", msg),
+            Self::ArgError => write!(f, "#[ARG ERROR] Incorrect argument amount..."),
+            Self::ExprError(msg) => write!(f, "#[EXPR ERROR] {}", msg),
             Self::RangeError(msg) => write!(f, "#[RANGE ERROR] {}", msg),
             Self::CellPError(msg) => write!(f, "#[CELL POINTER ERROR] {}", msg),
         }
