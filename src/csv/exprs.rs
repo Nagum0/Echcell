@@ -112,7 +112,7 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 }
 
 // -------------------- FUNCTIONS --------------------
-fn func_sum<'a>(csv: &'a CSV, args: &'a [Token]) -> Result<f64, CsvError> {
+fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     // Incorrect argument size:
     if args.len() != 2 {
         return Err(CsvError::ArgError);
