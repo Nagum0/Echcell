@@ -135,7 +135,7 @@ impl CSV {
 ///
 /// DOES NOT HANDLE INVALID EXPRESSIONS. (They will be parsed into the output file with a error message inside the corresponding cell).
 /// 
-/// Returns a Result type of () or std::io::Error if the file generation failed.
+/// Returns a Result type of () or CsvError if the file generation failed.
 pub fn generate_output(csv: &CSV) -> Result<(), CsvError> {
     // Creating output file:
     let mut output_file = match fs::File::create(format!("out_{}", csv.file)) {

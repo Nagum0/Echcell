@@ -27,6 +27,9 @@ Misato Katsuragi,30,Female,NULL
 = SUM A1 C1
 ```
 
+### FUNCTIONS
+
+
 ### CELL POINTERS
 - A **cell pointer** holds the x and y coordinates for a specific cell (it points to the cell's value);
 - The first character of a cell pointer is the column number (x coordinate) and the rest of the characters must be numbers representing the row number (y coordinate);
@@ -53,4 +56,7 @@ A1 B2
 # DEVELOPER DOCUMENTATION
 
 # TODO!
-- Custom error types;
+- SUM Function - DONE
+- Custom error types - DONE
+- AVG Function - Working on...
+- Mathematical expressions
