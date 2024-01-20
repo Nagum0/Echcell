@@ -54,6 +54,13 @@ impl Token {
             
         }).collect::<Vec<Self>>()
     }
+
+    pub fn get_cell(&self) -> Result<String, &str> {
+        match self {
+            Self::Cell(val) => Ok(val.clone()),
+            _ => Err("Incorrect cell type..."),
+        }
+    }
 }
 
 /// MAIN EVALUATER
@@ -103,8 +110,30 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 }
 
 // -------------------- FUNCTIONS --------------------
-fn func_sum<'a>(csv: &'a CSV, args: &[Token]) -> Result<f64, &'a str> {
+fn func_sum<'a>(csv: &'a CSV, args: &'a [Token]) -> Result<f64, &'a str> {
     println!("[ARGUMENTS FOR SUM] {:?}", args);
-    println!("{:?}", csv.get_range_values("A1", "B1"));
-    Ok(6.9)
+
+    // Incorrect argument size:
+    if args.len() != 2 {
+        return Err("#[EXPR ERROR] Incorrect argument size...");
+    }
+
+    // Extracting argument values:
+    let arg1 = args[0].get_cell()?;
+    let arg2 = args[1].get_cell()?;
+
+    // Getting range values:
+    let range_values = csv.get_range_values(&arg1, &arg2)?;
+    println!("{:?}", range_values);
+
+    let mut sum: f64 = 0.0;
+    
+    for i in range_values {
+        match i.parse::<f64>() {
+            Ok(val) => sum += val,
+            Err(_) => return Err("#[NULL]"),
+        }
+    }
+
+    Ok(sum)
 }
