@@ -1,4 +1,5 @@
 use super::CSV;
+use super::super::error::CsvError;
 
 /// FUNCTIONS ENUM
 /// Every impletemnted function is found here.
@@ -55,10 +56,11 @@ impl Token {
         }).collect::<Vec<Self>>()
     }
 
-    pub fn get_cell(&self) -> Result<String, &str> {
+    /// Returns Result type of String (the value in a Token::Cell) or a CsvError::
+    pub fn get_cell(&self) -> String {
         match self {
-            Self::Cell(val) => Ok(val.clone()),
-            _ => Err("Incorrect cell type..."),
+            Self::Cell(val) => val.clone(),
+            _ => "Unkown".to_string(),
         }
     }
 }
@@ -110,15 +112,15 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 }
 
 // -------------------- FUNCTIONS --------------------
-fn func_sum<'a>(csv: &'a CSV, args: &'a [Token]) -> Result<f64, &'a str> {
+fn func_sum<'a>(csv: &'a CSV, args: &'a [Token]) -> Result<f64, CsvError> {
     // Incorrect argument size:
     if args.len() != 2 {
-        return Err("#[EXPR ERROR] Incorrect argument size...");
+        return Err(CsvError::ArgError);
     }
 
     // Extracting argument values:
-    let arg1 = args[0].get_cell()?;
-    let arg2 = args[1].get_cell()?;
+    let arg1 = args[0].get_cell();
+    let arg2 = args[1].get_cell();
 
     // Getting range values:
     let range_values = csv.get_range_values(&arg1, &arg2)?;
@@ -126,7 +128,7 @@ fn func_sum<'a>(csv: &'a CSV, args: &'a [Token]) -> Result<f64, &'a str> {
     Ok(range_values.iter().try_fold(0.0, |acc, item| {
         match item.parse::<f64>() {
             Ok(val) => Ok(acc + val),
-            Err(_) => Err("#[NULL]"), 
+            Err(_) => Err(CsvError::NullError), 
         }
     })?)
 }

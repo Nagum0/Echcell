@@ -39,11 +39,9 @@ impl CSV {
     /// -- PRIVATE --
     /// CSV PARSER:
     /// Parses input into a tuple of Vec<String>(CSV header) and Vec<Vec<String>>(CSV body).
-    /// Returns a Result type of the tuple or std::io::Error. 
+    /// Returns a Result type of the tuple or CsvError. 
     fn parse(file_path: &String) -> Result<(Vec<String>, Vec<Vec<String>>), CsvError> {
         // Splitting file into lines:
-        //let lines: Vec<String> = fs::read_to_string(file_path)?.lines().map(String::from).collect();
-
         let lines: Vec<String> = match fs::read_to_string(file_path) {
             Ok(contents) => contents.lines().map(String::from).collect(),
             Err(_) => return Err(CsvError::FileParseError),
@@ -63,26 +61,26 @@ impl CSV {
         Ok((header, body))
     }
 
-    /// Receives a cell pointer and returns a column index or an error message.
-    fn get_column_cor(&self, cell_pointer: &str) -> Result<usize, &str> {
+    /// Receives a cell pointer and returns a column index or a CsvError::CellPError().
+    fn get_column_cor(&self, cell_pointer: &str) -> Result<usize, CsvError> {
         match self.header.iter().position(|col| col == &cell_pointer[0..1]) {
             Some(val) => Ok(val),
-            None             => Err("X cell pointer out of bounds..."), 
+            None             => Err(CsvError::CellPError("Column index out of bounds...".to_string())), 
         }
     }
 
-    /// Receives a cell pointer and returns a row index or an error message.
+    /// Receives a cell pointer and returns a row index or an CsvError::CellPError().
     /// Also checks whether the row coordinate is in bounds.
-    fn get_row_cor(&self, cell_pointer: &str) -> Result<usize, &str> {
+    fn get_row_cor(&self, cell_pointer: &str) -> Result<usize, CsvError> {
         // Getting the coordinate:
         let cor = match cell_pointer[1..cell_pointer.len()].parse::<usize>() {
             Ok(val) => val - 1,
-            Err(_)         => return Err("Error while parsing 'row' cordinate..."),
+            Err(_)         => return Err(CsvError::CellPError("Incorrect row index specifier...".to_string())),
         };
 
         // Checking whether it's outside of bounds:
         if cor > self.body.len() {
-            return Err("Y cell pointer index out of bounds...");
+            return Err(CsvError::CellPError("Row index out of bounds...".to_string()));
         }
 
         Ok(cor)
@@ -96,10 +94,10 @@ impl CSV {
         Ok(Self { file: file_path, header: parsed_data.0, body: parsed_data.1 })
     }
 
-    /// Returns a Result type of item (String. An item from the csv body) or a string slice with a specified error message.
+    /// Returns a Result type of item (String. An item from the csv body.) or a CsvError with a specified error message.
     /// This function can be called on a CSV object and takes in a cell pointer in this format: "A1", "C2", ...
     #[allow(unused)]
-    pub fn get_cell_value(&self, cell_pointer: &str) -> Result<String, &str> {
+    pub fn get_cell_value(&self, cell_pointer: &str) -> Result<String, CsvError> {
         // Getting the x coordinate:
         let x_cor = self.get_column_cor(cell_pointer)?;
         // Getting the y coordinate:
@@ -113,7 +111,7 @@ impl CSV {
     /// The resulting vector of strings are the values of cells inside the given range.
     /// Either the column or row index must match on both cell pointers (ranges are either column base or row based; nothing diagonal).
     #[allow(unused)]
-    pub fn get_range_values(&self, cell_pointer_start: &str, cell_pointer_end: &str) -> Result<Vec<String>, &str> {
+    pub fn get_range_values(&self, cell_pointer_start: &str, cell_pointer_end: &str) -> Result<Vec<String>, CsvError> {
         // Getting the coordinates:
         let x_start = self.get_column_cor(cell_pointer_start)?;
         let x_end = self.get_column_cor(cell_pointer_end)?;
@@ -128,7 +126,7 @@ impl CSV {
             }
         }
         else {
-            Err("#[RANGE ERROR] Unkown range type...")
+            Err(CsvError::RangeError("Unknown range type...".to_string()))
         }
     }
 }
