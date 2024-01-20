@@ -1,6 +1,8 @@
 use std::fs;
 use std::io::Write;
 
+use super::error::CsvError;
+
 mod exprs;
 use exprs::eval;
 
@@ -38,9 +40,14 @@ impl CSV {
     /// CSV PARSER:
     /// Parses input into a tuple of Vec<String>(CSV header) and Vec<Vec<String>>(CSV body).
     /// Returns a Result type of the tuple or std::io::Error. 
-    fn parse(file_path: &String) -> Result<(Vec<String>, Vec<Vec<String>>), std::io::Error> {
+    fn parse(file_path: &String) -> Result<(Vec<String>, Vec<Vec<String>>), CsvError> {
         // Splitting file into lines:
-        let lines: Vec<String> = fs::read_to_string(file_path)?.lines().map(String::from).collect();
+        //let lines: Vec<String> = fs::read_to_string(file_path)?.lines().map(String::from).collect();
+
+        let lines: Vec<String> = match fs::read_to_string(file_path) {
+            Ok(contents) => contents.lines().map(String::from).collect(),
+            Err(_) => return Err(CsvError::FileParseError),
+        };
 
         // Splitting lines by commas:
         let mut data: Vec<Vec<String>> = Vec::new();
@@ -84,7 +91,7 @@ impl CSV {
     /// -- PUBLIC --
     /// Creates a new CSV object.
     /// Returns a Result type of Self(CSV) or std::io::Error.
-    pub fn new(file_path: String) -> Result<Self, std::io::Error> {
+    pub fn new(file_path: String) -> Result<Self, CsvError> {
         let parsed_data = Self::parse(&file_path)?;
         Ok(Self { file: file_path, header: parsed_data.0, body: parsed_data.1 })
     }
@@ -131,18 +138,25 @@ impl CSV {
 /// DOES NOT HANDLE INVALID EXPRESSIONS. (They will be parsed into the output file with a error message inside the corresponding cell).
 /// 
 /// Returns a Result type of () or std::io::Error if the file generation failed.
-pub fn generate_output(csv: &CSV) -> Result<(), std::io::Error> {
+pub fn generate_output(csv: &CSV) -> Result<(), CsvError> {
     // Creating output file:
-    let mut output_file = fs::File::create(format!("out_{}", csv.file))?;
+    let mut output_file = match fs::File::create(format!("out_{}", csv.file)) {
+        Ok(f) => f,
+        Err(_) => return Err(CsvError::FileOutputError),
+    };
     
     // Writing the header to the output file:
-    writeln!(&mut output_file, "{}", csv.header.join(","))?;
+    match writeln!(&mut output_file, "{}", csv.header.join(",")) {
+        Ok(_)  => {},
+        Err(_) => return Err(CsvError::FileOutputError),
+    }
 
     // Writing the body and evaluating the expressions:
     csv.body.iter().try_for_each(|row| {
         let buffer: String = row.iter().map(|item| eval(item, &csv)).collect::<Vec<_>>().join(",");
-        writeln!(&mut output_file, "{}", buffer)
-    })?;
-
-    Ok(())
+        match writeln!(&mut output_file, "{}", buffer) {
+            Ok(_)  => Ok(()),
+            Err(_) => return Err(CsvError::FileOutputError),
+        }
+    })
 }
