@@ -1,0 +1,10 @@
+*.json
+*.TAG
+*.cargo-lock
+*.d
+*.exe
+*.pdb
+*.lock
+*.csv
+*.o
+*.bin
