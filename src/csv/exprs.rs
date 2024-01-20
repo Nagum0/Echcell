@@ -111,8 +111,6 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 
 // -------------------- FUNCTIONS --------------------
 fn func_sum<'a>(csv: &'a CSV, args: &'a [Token]) -> Result<f64, &'a str> {
-    println!("[ARGUMENTS FOR SUM] {:?}", args);
-
     // Incorrect argument size:
     if args.len() != 2 {
         return Err("#[EXPR ERROR] Incorrect argument size...");
@@ -124,16 +122,11 @@ fn func_sum<'a>(csv: &'a CSV, args: &'a [Token]) -> Result<f64, &'a str> {
 
     // Getting range values:
     let range_values = csv.get_range_values(&arg1, &arg2)?;
-    println!("{:?}", range_values);
 
-    let mut sum: f64 = 0.0;
-    
-    for i in range_values {
-        match i.parse::<f64>() {
-            Ok(val) => sum += val,
-            Err(_) => return Err("#[NULL]"),
+    Ok(range_values.iter().try_fold(0.0, |acc, item| {
+        match item.parse::<f64>() {
+            Ok(val) => Ok(acc + val),
+            Err(_) => Err("#[NULL]"), 
         }
-    }
-
-    Ok(sum)
+    })?)
 }
