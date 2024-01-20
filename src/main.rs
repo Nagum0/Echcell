@@ -1,9 +1,12 @@
 use std::env;
 
+mod error;
+use error::CsvError;
+
 mod csv;
 use csv::{CSV, generate_output};
 
-fn main() -> Result<(), std::io::Error> {
+fn main() -> Result<(), CsvError> {
     // Arguments:
     let args: Vec<String> = env::args().map(String::from).collect();
 
@@ -13,7 +16,10 @@ fn main() -> Result<(), std::io::Error> {
     // Creating output:
     match generate_output(&csv) {
         Ok(_) => println!("[INFO] Success"),
-        Err(err) => return Err(err),
+        Err(err) => {
+            eprintln!("{}", err);
+            return Err(err);
+        },
     }
 
     Ok(())
