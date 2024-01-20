@@ -105,6 +105,6 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 // -------------------- FUNCTIONS --------------------
 fn func_sum<'a>(csv: &'a CSV, args: &[Token]) -> Result<f64, &'a str> {
     println!("[ARGUMENTS FOR SUM] {:?}", args);
-    csv.get_range_values("A1", "B1")?;
+    println!("{:?}", csv.get_range_values("A1", "B1"));
     Ok(6.9)
 }
