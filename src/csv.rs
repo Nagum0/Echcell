@@ -33,12 +33,6 @@ impl RangeType {
             None
         }
     }
-
-    /// Returns the length of a range.
-    pub fn get_range_len() -> usize {
-        
-        1
-    }
 }
 
 impl CSV {
