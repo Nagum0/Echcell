@@ -33,6 +33,12 @@ impl RangeType {
             None
         }
     }
+
+    /// Returns the length of a range.
+    pub fn get_range_len() -> usize {
+        
+        1
+    }
 }
 
 impl CSV {
@@ -128,6 +134,11 @@ impl CSV {
         else {
             Err(CsvError::RangeError("Unknown range type...".to_string()))
         }
+    }
+
+    /// Returns the length of a range.
+    pub fn get_range_len(&self, cell_pointer_start: &str, cell_pointer_end: &str) -> Result<usize, CsvError> {
+        Ok(Self::get_range_values(&self, cell_pointer_start, cell_pointer_end)?.len())
     }
 }
 

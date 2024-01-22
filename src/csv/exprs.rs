@@ -150,14 +150,10 @@ fn func_avg(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     }
     
     // Calculating range length:
-    let arg1 = args[0].get_cell();
-    let arg2 = args[1].get_cell();
-    let range_len = csv.get_range_values(&arg1, &arg2)?.len();
+    let range_len = csv.get_range_len(&args[0].get_cell(), &args[1].get_cell())?;
 
     // To get the sum I reuse `func_sum`:
     let sum: f64 = func_sum(csv, args)?;
-    println!("[FROM func_avg] {}", sum);
-    println!("[FROM func_avg] {} {}", sum / range_len as f64, range_len);
 
     Ok(sum / range_len as f64)
 }
