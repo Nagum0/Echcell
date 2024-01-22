@@ -58,5 +58,6 @@ A1 B2
 # TODO!
 - SUM Function - DONE
 - Custom error types - DONE
-- AVG Function - Working on...
-- Mathematical expressions
+- AVG Function - Done
+- Mathematical expressions - Working on...
+- Count function
