@@ -13,7 +13,7 @@ pub enum CsvError {
 impl fmt::Display for CsvError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::FileError(msg)  => write!(f, "#[FILE ERROR] {}", msg),
+            Self::FileError(msg) => write!(f, "#[FILE ERROR] {}", msg),
             Self::ArgError => write!(f, "#[ARG ERROR] Incorrect argument amount..."),
             Self::ExprError(msg) => write!(f, "#[EXPR ERROR] {}", msg),
             Self::RangeError(msg) => write!(f, "#[RANGE ERROR] {}", msg),

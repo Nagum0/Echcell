@@ -5,6 +5,6 @@
 *.exe
 *.pdb
 *.lock
-*.csv
+# *.csv
 *.o
 *.bin
