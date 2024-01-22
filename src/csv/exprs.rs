@@ -7,9 +7,9 @@ use super::super::error::CsvError;
 /// 
 /// Sum  => Returns the sum over a range of cells;
 ///         It takes in 2 arguments the start of the range and the end of a range. 
-///         (Currently working on)
 /// 
 /// Avg  => Returns the average of a range of cells;
+///         It takes in 2 arguments the start of the range ant the end of a range.
 #[derive(Debug)]
 #[allow(unused)]
 enum Functions {
@@ -70,7 +70,7 @@ impl Token {
 /// If the evaluation fails it returns a String with an error message.
 pub fn eval(item: &String, csv: &CSV) -> String {
     if item.is_empty() {
-        return "#NULL".to_string();
+        return "#[NULL]".to_string();
     }
 
     // If the cell contains a expression:
@@ -78,6 +78,7 @@ pub fn eval(item: &String, csv: &CSV) -> String {
         println!("[FOUND EXPR] {}", item);
 
         // Expression to be tokenized:
+        // (First 2 elements are removed because they are the '= ')
         let expr: String = item[2..item.len()].to_string();
 
         // Tokens:
@@ -85,33 +86,41 @@ pub fn eval(item: &String, csv: &CSV) -> String {
         println!("[TOKENS] {:?}", tokens);
         
         if tokens.is_empty() {
-            return "#TOKEN ERROR".to_string();
+            return "#[TOKEN ERROR]".to_string();
         }
 
         // We match on the function type and evaluate it.
-        // Every value returned from a funcion will be parse to a String and returned.
+        // Every value returned from a funcion will be parsed to a String and returned.
         match &tokens[0] {
             Token::Func(f) => {
                 match f {
-                    // SUM
+                    // SUM:
                     Functions::Sum  => {
                         match func_sum(&csv, &tokens[1..tokens.len()]) {
-                            Ok(n)     => return n.to_string(),
+                            Ok(n)    => return n.to_string(),
                             Err(err) => return err.to_string(),
                         }
                     },
-                    Functions::Avg  => todo!(),
+                    // AVG:
+                    Functions::Avg  => {
+                        match func_avg(&csv, &tokens[1..tokens.len()]) {
+                            Ok(n)    => return n.to_string(),
+                            Err(err) => return err.to_string(),
+                        }
+                    },
                     Functions::Expr => todo!(),
                 }
             },
-            _ => return "#UNKNOWN FUNCTION".to_string(),
+            _ => return "#[UNKNOWN FUNCTION]".to_string(),
         }
     }
-
+    
+    // If it's not a expression:
     item.to_string()
 }
 
-// -------------------- FUNCTIONS --------------------
+/// -------------------- FUNCTIONS --------------------
+/// SUM FUNCTION:
 fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     // Incorrect argument size:
     if args.len() != 2 {
@@ -131,4 +140,20 @@ fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
             Err(_) => Err(CsvError::ExprError("NaN".to_string())), 
         }
     })?)
+}
+
+/// AVG FUNCTION:
+fn func_avg(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
+    // Incorrect argument size:
+    if args.len() != 2 {
+        return Err(CsvError::ArgError);
+    }
+    
+    // Calculating range length:
+    let range_len = csv.get_range_len(&args[0].get_cell(), &args[1].get_cell())?;
+
+    // To get the sum I reuse `func_sum`:
+    let sum: f64 = func_sum(csv, args)?;
+
+    Ok(sum / range_len as f64)
 }

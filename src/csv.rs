@@ -129,6 +129,11 @@ impl CSV {
             Err(CsvError::RangeError("Unknown range type...".to_string()))
         }
     }
+
+    /// Returns the length of a range.
+    pub fn get_range_len(&self, cell_pointer_start: &str, cell_pointer_end: &str) -> Result<usize, CsvError> {
+        Ok(Self::get_range_values(&self, cell_pointer_start, cell_pointer_end)?.len())
+    }
 }
 
 /// Iterates over the created CSV object and evaluates all the expressions found and creates an output csv file.
