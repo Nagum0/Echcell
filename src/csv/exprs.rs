@@ -19,6 +19,15 @@ enum Functions {
     Avg,
 }
 
+/// BINARY OPERATORS
+#[derive(Debug)]
+enum BinaryOp {
+    Plus,
+    Minus,
+    Mult,
+    Div,
+}
+
 /// TOKEN ENUM
 /// Cell   => Holds the value of a cell as a String from the csv body;
 /// Func   => Represents a function with the `Functions` enum;
@@ -27,6 +36,7 @@ enum Functions {
 enum Token {
     Cell(String),
     Number(f64),
+    Operator(BinaryOp),
     Func(Functions),
 }
 
@@ -37,6 +47,7 @@ impl Token {
         let split_expr: Vec<String> = expr.split_whitespace().map(String::from).collect();
         
         split_expr.iter().map(|word| {
+            // Functions:
             if word == "SUM" {
                 Self::Func(Functions::Sum)
             }
@@ -46,10 +57,26 @@ impl Token {
             else if word == "CALC" {
                 Self::Func(Functions::Calc)
             }
+
+            // Binary operators:
+            else if word == "+" {
+                Self::Operator(BinaryOp::Plus)
+            }
+            else if word == "-" {
+                Self::Operator(BinaryOp::Minus)
+            }
+            else if word == "*" {
+                Self::Operator(BinaryOp::Mult)
+            }
+            else if word == "/" {
+                Self::Operator(BinaryOp::Div)
+            }
+
             // If the word is parsable to f64 then its a Number:
             else if let Ok(n) = word.parse::<f64>() {
                 Self::Number(n)
             }
+
             else {
                 Self::Cell(word.clone())
             }
@@ -57,7 +84,7 @@ impl Token {
         }).collect::<Vec<Self>>()
     }
 
-    /// Returns Result type of String (the value in a Token::Cell) or a CsvError::
+    /// Returns Result type of String (the value in a Token::Cell):
     pub fn get_cell(&self) -> String {
         match self {
             Self::Cell(val) => val.clone(),
@@ -111,7 +138,7 @@ pub fn eval(item: &String, csv: &CSV) -> String {
                     },
                     // CALC:
                     Functions::Calc => {
-                        match func_calc(&csv, &tokens[1..tokens.len()]) {
+                        match func_calc(&tokens[1..tokens.len()]) {
                             Ok(n)    => return n.to_string(),
                             Err(err) => return err.to_string(),
                         }
@@ -129,10 +156,16 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 /// -------------------- FUNCTIONS --------------------
 
 /// CALC(Mathematical expression):
-/// Evaluates a mathematical expression:
-fn func_calc(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
-    println!("{:?}", args);
+/// Evaluates a mathematical expression;
+/// It will turn the received arguments (which should be numbers and binary operators) into RPN form;
+fn func_calc(args: &[Token]) -> Result<f64, CsvError> {
+    let rpn_args = parse_to_rpn(args);
+    println!("[CALC ARGS] {:?}", rpn_args);
     Ok(0.0)
+}
+
+fn parse_to_rpn(args: &[Token]) -> Result<&[Token], CsvError> {
+    Ok(args)
 }
 
 /// SUM FUNCTION:
