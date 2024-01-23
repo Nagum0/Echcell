@@ -28,7 +28,9 @@ Misato Katsuragi,30,Female,NULL
 ```
 
 ### FUNCTIONS
-
+- SUM
+- AVG
+- CALC
 
 ### CELL POINTERS
 - A **cell pointer** holds the x and y coordinates for a specific cell (it points to the cell's value);
@@ -58,6 +60,6 @@ A1 B2
 # TODO!
 - SUM Function - DONE
 - Custom error types - DONE
-- AVG Function - Done
+- AVG Function - DONE
 - Mathematical expressions - Working on...
 - Count function

@@ -3,7 +3,7 @@ use super::super::error::CsvError;
 
 /// FUNCTIONS ENUM
 /// Every impletemnted function is found here.
-/// Expr => Mathematical expression (+,-,*,/);
+/// Calc => Mathematical expression (+,-,*,/);
 /// 
 /// Sum  => Returns the sum over a range of cells;
 ///         It takes in 2 arguments the start of the range and the end of a range. 
@@ -13,7 +13,7 @@ use super::super::error::CsvError;
 #[derive(Debug)]
 #[allow(unused)]
 enum Functions {
-    Expr,
+    Calc,
     Sum,
     Avg,
 }
@@ -42,8 +42,8 @@ impl Token {
             else if word == "AVG" {
                 Self::Func(Functions::Avg)
             }
-            else if word == "EXPR" {
-                Self::Func(Functions::Expr)
+            else if word == "CALC" {
+                Self::Func(Functions::Calc)
             }
             // If the word is parsable to f64 then its a Number:
             else if let Ok(n) = word.parse::<f64>() {
@@ -73,7 +73,7 @@ pub fn eval(item: &String, csv: &CSV) -> String {
         return "#[NULL]".to_string();
     }
 
-    // If the cell contains a expression:
+    // If the cell contains an expression:
     if &item[0..1] == "=" {
         println!("[FOUND EXPR] {}", item);
 
@@ -108,7 +108,11 @@ pub fn eval(item: &String, csv: &CSV) -> String {
                             Err(err) => return err.to_string(),
                         }
                     },
-                    Functions::Expr => todo!(),
+                    // CALC:
+                    Functions::Calc => {
+                        println!("IN CALC");
+                        return "c".to_string();
+                    },
                 }
             },
             _ => return "#[UNKNOWN FUNCTION]".to_string(),
@@ -120,6 +124,9 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 }
 
 /// -------------------- FUNCTIONS --------------------
+
+/// CALC(Mathematical expression)
+
 /// SUM FUNCTION:
 fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     // Incorrect argument size:
