@@ -4,6 +4,7 @@ use super::super::error::CsvError;
 /// FUNCTIONS ENUM
 /// Every impletemnted function is found here.
 /// Calc => Mathematical expression (+,-,*,/);
+///         Evaluates a given mathematical expression.
 /// 
 /// Sum  => Returns the sum over a range of cells;
 ///         It takes in 2 arguments the start of the range and the end of a range. 
@@ -110,8 +111,10 @@ pub fn eval(item: &String, csv: &CSV) -> String {
                     },
                     // CALC:
                     Functions::Calc => {
-                        println!("IN CALC");
-                        return "c".to_string();
+                        match func_calc(&csv, &tokens[1..tokens.len()]) {
+                            Ok(n)    => return n.to_string(),
+                            Err(err) => return err.to_string(),
+                        }
                     },
                 }
             },
@@ -125,7 +128,12 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 
 /// -------------------- FUNCTIONS --------------------
 
-/// CALC(Mathematical expression)
+/// CALC(Mathematical expression):
+/// Evaluates a mathematical expression:
+fn func_calc(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
+    println!("{:?}", args);
+    Ok(0.0)
+}
 
 /// SUM FUNCTION:
 fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
