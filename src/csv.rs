@@ -154,7 +154,7 @@ pub fn generate_output(csv: &CSV) -> Result<(), CsvError> {
         Ok(_)  => {},
         Err(_) => return Err(CsvError::FileError("Could not write to output file...".to_string())),
     }
-
+    
     // Writing the body and evaluating the expressions:
     csv.body.iter().try_for_each(|row| {
         let buffer: String = row.iter().map(|item| eval(item, &csv)).collect::<Vec<_>>().join(",");

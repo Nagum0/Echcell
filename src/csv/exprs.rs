@@ -138,7 +138,7 @@ pub fn eval(item: &String, csv: &CSV) -> String {
                     },
                     // CALC:
                     Functions::Calc => {
-                        match func_calc(&tokens[1..tokens.len()]) {
+                        match func_calc(&csv, &tokens[1..tokens.len()]) {
                             Ok(n)    => return n.to_string(),
                             Err(err) => return err.to_string(),
                         }
@@ -156,16 +156,43 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 /// -------------------- FUNCTIONS --------------------
 
 /// CALC(Mathematical expression):
+
 /// Evaluates a mathematical expression;
-/// It will turn the received arguments (which should be numbers and binary operators) into RPN form;
-fn func_calc(args: &[Token]) -> Result<f64, CsvError> {
-    let rpn_args = parse_to_rpn(args);
-    println!("[CALC ARGS] {:?}", rpn_args);
+/// It will turn the received arguments (which should be numbers, cells or binary operators) into RPN form;
+fn func_calc(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
+    let rpn_args = parse_to_rpn(&csv, &args)?;
+    println!("[RPN AGRS] {:?}", rpn_args);
     Ok(0.0)
 }
 
-fn parse_to_rpn(args: &[Token]) -> Result<&[Token], CsvError> {
-    Ok(args)
+/// Parses arguments into rpn form for `func_calc`:
+/// Iterates over the received arguments and form an RPN expression from them;
+/// This way I don't have to deal with precedence;
+fn parse_to_rpn(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
+    println!("[FROM RPN PARSER] {:?}", args);
+
+    let mut postfix: Vec<Token> = Vec::new();
+    let mut stack: Vec<Token> = Vec::new();    
+    
+    let _ = args.iter().try_for_each(|token| {
+        match token {
+            Token::Number(n) => { 
+                postfix.push(Token::Number(*n));
+                Ok(())
+            },
+            Token::Cell(cell_ptr) => {
+                println!("{:?}", csv.get_cell_value(cell_ptr));
+                Ok(())
+            },
+            Token::Operator(op) => {
+                println!("{:?}", op);
+                Ok(())
+            }
+            _ => Err(CsvError::ExprError("NaN".to_string())),
+        }
+    })?;
+    
+    Ok(postfix)
 }
 
 /// SUM FUNCTION:
