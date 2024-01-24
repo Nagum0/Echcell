@@ -234,7 +234,7 @@ fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
 
     // Getting range values:
     let range_values = csv.get_range_values(&arg1, &arg2)?;
-
+    
     Ok(range_values.iter().try_fold(0.0, |acc, item| {
         match item.parse::<f64>() {
             Ok(val) => Ok(acc + val),

@@ -28,7 +28,11 @@ Misato Katsuragi,30,Female,NULL
 ```
 
 ### FUNCTIONS
-- SUM
+<details>
+<summary>SUM</summary>
+<br>
+dp test
+</details>
 - AVG
 - CALC
 
