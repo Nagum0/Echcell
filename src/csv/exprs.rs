@@ -20,12 +20,28 @@ enum Functions {
 }
 
 /// BINARY OPERATORS
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum BinaryOp {
     Plus,
     Minus,
     Mult,
     Div,
+}
+
+impl BinaryOp {
+    /// Checks whether the operator the method was called on has higher precedence thant the comparison one.
+    pub fn check_precendece(&self, op_cmp: &Self) -> bool {
+        match (self, op_cmp) {
+            (Self::Plus | Self::Minus, Self::Mult | Self::Div) => false,
+            (Self::Mult | Self::Div, Self::Plus | Self::Minus) => true,
+            _ => false, // Equal precedence for the same operators
+        }
+        // match (self, op_cmp) {
+        //     (Self::Mult, Self::Plus) | (Self::Div, Self::Plus) |
+        //     (Self::Mult, Self::Minus) | (Self::Div, Self::Minus) => true,
+        //     _ => false,
+        // }
+    }
 }
 
 /// TOKEN ENUM
@@ -103,7 +119,7 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 
     // If the cell contains an expression:
     if &item[0..1] == "=" {
-        println!("[FOUND EXPR] {}", item);
+        //println!("[FOUND EXPR] {}", item);
 
         // Expression to be tokenized:
         // (First 2 elements are removed because they are the '= ')
@@ -111,7 +127,7 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 
         // Tokens:
         let tokens = Token::tokenize(&expr);
-        println!("[TOKENS] {:?}", tokens);
+        //println!("[TOKENS] {:?}", tokens);
         
         if tokens.is_empty() {
             return "#[TOKEN ERROR]".to_string();
@@ -172,7 +188,7 @@ fn parse_to_rpn(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
     println!("[FROM RPN PARSER] {:?}", args);
 
     let mut postfix: Vec<Token> = Vec::new();
-    let mut stack: Vec<Token> = Vec::new();    
+    let mut stack: Vec<BinaryOp> = Vec::new();    
     
     let _ = args.iter().try_for_each(|token| {
         match token {
@@ -181,17 +197,47 @@ fn parse_to_rpn(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
                 Ok(())
             },
             Token::Cell(cell_ptr) => {
-                println!("{:?}", csv.get_cell_value(cell_ptr));
+                let value = csv.get_cell_value(cell_ptr)?;
+                match value.parse::<f64>() {
+                    Ok(n)  => postfix.push(Token::Number(n)),
+                    Err(_) => return Err(CsvError::ExprError("NaN".to_string()))
+                }
                 Ok(())
             },
             Token::Operator(op) => {
-                println!("{:?}", op);
+                //println!("{:?}", op);
+                //let mut i: usize = 0;
+                
+                if stack.is_empty() {
+                    stack.push(op.clone());
+                }
+                else if op.check_precendece(stack.last().unwrap()) {
+                    stack.push(op.clone());
+                }
+                else {
+                    loop {
+                        if stack.is_empty() {
+                            stack.push(op.clone());
+                            break;
+                        }
+
+                        else if op.check_precendece(stack.last().unwrap()) {
+                            stack.push(op.clone());
+                            break;
+                        }
+                        let val = stack.pop().unwrap();
+                        postfix.push(Token::Operator(val.clone()));
+                    }                   
+                }
+
                 Ok(())
             }
             _ => Err(CsvError::ExprError("NaN".to_string())),
         }
     })?;
     
+    println!("[STACK] {:?}", stack);
+
     Ok(postfix)
 }
 
