@@ -34,13 +34,7 @@ impl BinaryOp {
         match (self, op_cmp) {
             (Self::Plus | Self::Minus, Self::Mult | Self::Div) => false,
             (Self::Mult | Self::Div, Self::Plus | Self::Minus) => true,
-            _ => false, // Equal precedence for the same operators
-        }
-        // match (self, op_cmp) {
-        //     (Self::Mult, Self::Plus) | (Self::Div, Self::Plus) |
-        //     (Self::Mult, Self::Minus) | (Self::Div, Self::Minus) => true,
-        //     _ => false,
-        // }
+            _ => false,       }
     }
 }
 
@@ -174,18 +168,18 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 /// CALC(Mathematical expression):
 
 /// Evaluates a mathematical expression;
-/// It will turn the received arguments (which should be numbers, cells or binary operators) into RPN form;
+/// It will turn the received arguments (which should be numbers, cells or binary operators) into postfix form;
 fn func_calc(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
-    let rpn_args = parse_to_rpn(&csv, &args)?;
-    println!("[RPN AGRS] {:?}", rpn_args);
+    let postfix_args = infix_to_postfix(&csv, &args)?;
+    println!("[POSTFIX AGRS] {:?}", postfix_args);
     Ok(0.0)
 }
 
 /// Parses arguments into rpn form for `func_calc`:
-/// Iterates over the received arguments and form an RPN expression from them;
-/// This way I don't have to deal with precedence;
-fn parse_to_rpn(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
-    println!("[FROM RPN PARSER] {:?}", args);
+/// Iterates over the received arguments and forms an postfix expression from them;
+/// This way I don't have to deal with precedence checking;
+fn infix_to_postfix(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
+    println!("[FROM POSTIX PARSER] {:?}", args);
 
     let mut postfix: Vec<Token> = Vec::new();
     let mut stack: Vec<BinaryOp> = Vec::new();    
@@ -205,38 +199,24 @@ fn parse_to_rpn(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
                 Ok(())
             },
             Token::Operator(op) => {
-                //println!("{:?}", op);
-                //let mut i: usize = 0;
-                
-                if stack.is_empty() {
-                    stack.push(op.clone());
+                while !stack.is_empty() && !op.check_precendece(stack.last().unwrap()) {
+                    postfix.push(Token::Operator(stack.pop().unwrap()));
                 }
-                else if op.check_precendece(stack.last().unwrap()) {
-                    stack.push(op.clone());
-                }
-                else {
-                    loop {
-                        if stack.is_empty() {
-                            stack.push(op.clone());
-                            break;
-                        }
+                stack.push(op.clone());
 
-                        else if op.check_precendece(stack.last().unwrap()) {
-                            stack.push(op.clone());
-                            break;
-                        }
-                        let val = stack.pop().unwrap();
-                        postfix.push(Token::Operator(val.clone()));
-                    }                   
-                }
-
-                Ok(())
+                Ok(()) 
             }
             _ => Err(CsvError::ExprError("NaN".to_string())),
         }
     })?;
     
-    println!("[STACK] {:?}", stack);
+    // Finishing up the stack:
+    while !stack.is_empty() {
+        match stack.pop() {
+            Some(op) => postfix.push(Token::Operator(op.clone())),
+            None     => {},
+        }
+    }
 
     Ok(postfix)
 }
