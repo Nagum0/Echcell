@@ -122,8 +122,6 @@ impl Token {
             
         }).collect::<Vec<Self>>()
     }
-    
-   
 
     /// Returns Result type of String (the value in a Token::Cell):
     pub fn get_cell(&self) -> String {
@@ -213,6 +211,25 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 
 fn func_if(_csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
     println!("[IF ARGS] {:?}", args);
+
+    // Split condition and the rest:
+    let mut condition_split: Vec<Vec<Token>> = Vec::new();
+    condition_split.push(Vec::new());
+    let mut i = 0;
+
+    args.iter().for_each(|token| {
+        match token {
+            Token::Then => {
+                condition_split.push(Vec::new());
+                i += 1;
+            },
+            _ => condition_split[i].push(token.clone()),
+        }
+    });
+
+    println!("[CONDITION SPLIT] {:?}", condition_split);
+    // Testing out how to get functions inside ifs:
+    println!("[TEST] {:?}", func_sum(&_csv, &condition_split[0][1..condition_split[0].len()].to_vec()));
 
     Ok("astolfo".to_string())
 }
