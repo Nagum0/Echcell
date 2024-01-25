@@ -171,15 +171,58 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 /// It will turn the received arguments (which should be numbers, cells or binary operators) into postfix form;
 fn func_calc(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     let postfix_args = infix_to_postfix(&csv, &args)?;
-    println!("[POSTFIX AGRS] {:?}", postfix_args);
-    Ok(0.0)
+    //println!("[POSTFIX AGRS] {:?}", postfix_args);
+
+    let mut stack: Vec<f64> = Vec::new();
+        
+    postfix_args.iter().try_for_each(|token| {
+        match token {
+            Token::Number(n) => {
+                stack.push(*n);
+                Ok(())
+            },
+            Token::Operator(op) => {
+                //println!("[STACK] {:?} [LEN] {}", stack, stack.len());
+                let val1 = match stack.pop() {
+                    Some(v) => v,
+                    None    => return Err(CsvError::ExprError("Incorrect math expression...".to_string())),
+                };
+
+                let val2 = match stack.pop() {
+                    Some(v) => v,
+                    None    => return Err(CsvError::ExprError("Incorrect math expression...".to_string())),
+                };
+                
+                // Calculating:
+                match op {
+                    BinaryOp::Plus  => stack.push(val2 + val1),
+                    BinaryOp::Minus => stack.push(val2 - val1),
+                    BinaryOp::Mult  => stack.push(val2 * val1),
+                    BinaryOp::Div   => stack.push(val2 / val1),
+                }
+
+                Ok(())
+            }
+            _ => Err(CsvError::ExprError("NaN".to_string())),
+       } 
+    })?;
+    
+    // If the stack is empty:
+    if stack.is_empty() {
+        return Err(CsvError::ExprError("Empty stack...".to_string()));
+    }
+    else if stack.len() > 1 {
+        return Err(CsvError::ExprError("Incorrect math expression...".to_string()));
+    }
+
+    Ok(*stack.last().unwrap())
 }
 
 /// Parses arguments into postfix form for `func_calc`:
 /// Iterates over the received arguments and forms a postfix expression from them;
 /// This way I don't have to deal with precedence checking;
 fn infix_to_postfix(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
-    println!("[FROM POSTIX PARSER] {:?}", args);
+    //println!("[FROM POSTIX PARSER] {:?}", args);
 
     let mut postfix: Vec<Token> = Vec::new();
     let mut stack: Vec<BinaryOp> = Vec::new();    

@@ -15,7 +15,7 @@ fn main() -> Result<(), CsvError> {
     
     // Creating output:
     match generate_output(&csv) {
-        Ok(_) => println!("[INFO] Success"),
+        Ok(_) => println!("\n\t[INFO] Success\n"),
         Err(err) => {
             eprintln!("{}", err);
             return Err(err);
