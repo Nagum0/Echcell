@@ -165,7 +165,7 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 
 /// -------------------- FUNCTIONS --------------------
 
-/// CALC(Mathematical expression):
+/// --- CALC(Mathematical expression):
 
 /// Evaluates a mathematical expression;
 /// It will turn the received arguments (which should be numbers, cells or binary operators) into postfix form;
@@ -264,7 +264,7 @@ fn infix_to_postfix(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
     Ok(postfix)
 }
 
-/// SUM FUNCTION:
+/// --- SUM FUNCTION:
 fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     // Incorrect argument size:
     if args.len() != 2 {
@@ -286,7 +286,7 @@ fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     })?)
 }
 
-/// AVG FUNCTION:
+/// --- AVG FUNCTION:
 fn func_avg(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     // Incorrect argument size:
     if args.len() != 2 {

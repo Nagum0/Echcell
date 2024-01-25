@@ -63,11 +63,9 @@ A1 A5
 A1 B2
 ```
 
-# DEVELOPER DOCUMENTATION
-
 # TODO!
 - SUM Function - DONE
 - Custom error types - DONE
 - AVG Function - DONE
-- Mathematical expressions - Working on...
-- Count function
+- Mathematical expressions - DONE
+- IF function - Working on...
