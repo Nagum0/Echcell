@@ -1,2 +1,2 @@
 A,B,C
-69,0,= IF A1 == 69;= CALC 1 + 2;0
+69,0,= IF A1 == 69 THEN 10 ELSE Astolfo

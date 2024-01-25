@@ -17,6 +17,7 @@ enum Functions {
     Calc,
     Sum,
     Avg,
+    If,
 }
 
 /// BINARY OPERATORS
@@ -48,6 +49,8 @@ enum Token {
     Number(f64),
     Operator(BinaryOp),
     Func(Functions),
+
+    // Function specific tokens:
 }
 
 impl Token {
@@ -66,6 +69,9 @@ impl Token {
             }
             else if word == "CALC" {
                 Self::Func(Functions::Calc)
+            }
+            else if word == "IF" {
+                Self::Func(Functions::If) 
             }
 
             // Binary operators:
@@ -153,6 +159,12 @@ pub fn eval(item: &String, csv: &CSV) -> String {
                             Err(err) => return err.to_string(),
                         }
                     },
+                    Functions::If   => {
+                        match func_if(&csv, &tokens[1..tokens.len()]) {
+                            Ok(val)  => return val,
+                            Err(err) => return err.to_string(),
+                        }
+                    }
                 }
             },
             _ => return "#[UNKNOWN FUNCTION]".to_string(),
@@ -163,9 +175,24 @@ pub fn eval(item: &String, csv: &CSV) -> String {
     item.to_string()
 }
 
+/// ---------------------------------------------------
 /// -------------------- FUNCTIONS --------------------
+/// ---------------------------------------------------
 
-/// --- CALC(Mathematical expression):
+/// ---------------------------------------------------
+/// --------------------     IF    --------------------
+/// ---------------------------------------------------
+
+fn func_if(csv: &CSV, args: &[Token]) -> Result<String, CsvError> {
+    println!("[IF ARGS] {:?}", args);
+    Ok("astolfo".to_string())
+}
+
+/// --------------------     IF    --------------------
+
+/// ---------------------------------------------------
+/// --------------------   CALC    --------------------
+/// ---------------------------------------------------
 
 /// Evaluates a mathematical expression;
 /// It will turn the received arguments (which should be numbers, cells or binary operators) into postfix form;
@@ -264,6 +291,12 @@ fn infix_to_postfix(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
     Ok(postfix)
 }
 
+/// --------------------   CALC    --------------------
+
+/// ---------------------------------------------------
+/// --------------------    SUM    --------------------
+/// ---------------------------------------------------
+
 /// --- SUM FUNCTION:
 fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     // Incorrect argument size:
@@ -285,8 +318,12 @@ fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
         }
     })?)
 }
+/// --------------------    SUM    --------------------
 
-/// --- AVG FUNCTION:
+/// ---------------------------------------------------
+/// --------------------    AVG    --------------------
+/// ---------------------------------------------------
+
 fn func_avg(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     // Incorrect argument size:
     if args.len() != 2 {
@@ -301,3 +338,5 @@ fn func_avg(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
 
     Ok(sum / range_len as f64)
 }
+
+// --------------------    AVG    --------------------
