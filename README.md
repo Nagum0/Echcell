@@ -28,9 +28,17 @@ Misato Katsuragi,30,Female,NULL
 ```
 
 ### FUNCTIONS
-- SUM
-- AVG
-- CALC
+- Every function takes in arguments.
+
+#### Defined functions:
+<details>
+<summary>More</summary>
+<b>SUM</b>: Takes in a range and returns their sum;
+<br>
+<b>AVG</b>: Takes in a range and returns their average;
+<br>
+<b>CALC</b>: Takes in any infix mathematical expression and evaluates it;
+</details>
 
 ### CELL POINTERS
 - A **cell pointer** holds the x and y coordinates for a specific cell (it points to the cell's value);

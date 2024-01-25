@@ -12,10 +12,10 @@ fn main() -> Result<(), CsvError> {
           
     // Creating csv:
     let csv: CSV = CSV::new(args[1].clone())?;
-     
+    
     // Creating output:
     match generate_output(&csv) {
-        Ok(_) => println!("[INFO] Success"),
+        Ok(_) => println!("\n\t[INFO] Success\n"),
         Err(err) => {
             eprintln!("{}", err);
             return Err(err);
