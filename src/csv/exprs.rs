@@ -21,6 +21,7 @@ enum Functions {
 }
 
 /// BINARY OPERATORS
+/// Mainly used for CALC function.
 #[derive(Debug, Clone, Copy)]
 enum BinaryOp {
     Plus,
@@ -39,18 +40,29 @@ impl BinaryOp {
     }
 }
 
+/// COMPARISON OPERATORS
+/// Mainly used in _IF functions.
+#[derive(Debug)]
+enum CmpOp {
+    Eq,
+}
+
 /// TOKEN ENUM
-/// Cell   => Holds the value of a cell as a String from the csv body;
-/// Func   => Represents a function with the `Functions` enum;
-/// Number => A number (currently it is a f64); 
+/// Cell     => Holds the value of a cell as a String from the csv body (can be a cell_ptr or a string of text);
+/// Func     => Represents a function with the `Functions` enum;
+/// Number   => A number (currently it is a f64);
+/// Operator => Holds a BinaryOp. Used for CALC function and other math expressions;
 #[derive(Debug)]
 enum Token {
     Cell(String),
     Number(f64),
     Operator(BinaryOp),
+    CmpOperator(CmpOp),
     Func(Functions),
 
-    // Function specific tokens:
+    // IF specific tokens:
+    Then,
+    Else,
 }
 
 impl Token {
@@ -73,6 +85,12 @@ impl Token {
             else if word == "IF" {
                 Self::Func(Functions::If) 
             }
+            else if word == "THEN" {
+                Self::Then
+            }
+            else if word == "ELSE" {
+                Self::Else
+            }
 
             // Binary operators:
             else if word == "+" {
@@ -86,6 +104,11 @@ impl Token {
             }
             else if word == "/" {
                 Self::Operator(BinaryOp::Div)
+            }
+
+            // Comparison operators:
+            else if word == "==" {
+                Self::CmpOperator(CmpOp::Eq)
             }
 
             // If the word is parsable to f64 then its a Number:
@@ -159,6 +182,7 @@ pub fn eval(item: &String, csv: &CSV) -> String {
                             Err(err) => return err.to_string(),
                         }
                     },
+                    // IF:
                     Functions::If   => {
                         match func_if(&csv, &tokens[1..tokens.len()]) {
                             Ok(val)  => return val,
@@ -183,8 +207,10 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 /// --------------------     IF    --------------------
 /// ---------------------------------------------------
 
-fn func_if(csv: &CSV, args: &[Token]) -> Result<String, CsvError> {
+fn func_if(_csv: &CSV, args: &[Token]) -> Result<String, CsvError> {
     println!("[IF ARGS] {:?}", args);
+    
+
     Ok("astolfo".to_string())
 }
 
