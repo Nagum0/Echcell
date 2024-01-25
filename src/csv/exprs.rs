@@ -175,8 +175,8 @@ fn func_calc(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
     Ok(0.0)
 }
 
-/// Parses arguments into rpn form for `func_calc`:
-/// Iterates over the received arguments and forms an postfix expression from them;
+/// Parses arguments into postfix form for `func_calc`:
+/// Iterates over the received arguments and forms a postfix expression from them;
 /// This way I don't have to deal with precedence checking;
 fn infix_to_postfix(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
     println!("[FROM POSTIX PARSER] {:?}", args);
