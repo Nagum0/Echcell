@@ -11,7 +11,7 @@ use super::super::error::CsvError;
 /// 
 /// Avg  => Returns the average of a range of cells;
 ///         It takes in 2 arguments the start of the range ant the end of a range.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 #[allow(unused)]
 enum Functions {
     Calc,
@@ -42,7 +42,7 @@ impl BinaryOp {
 
 /// COMPARISON OPERATORS
 /// Mainly used in _IF functions.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum CmpOp {
     Eq,
 }
@@ -52,7 +52,7 @@ enum CmpOp {
 /// Func     => Represents a function with the `Functions` enum;
 /// Number   => A number (currently it is a f64);
 /// Operator => Holds a BinaryOp. Used for CALC function and other math expressions;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Token {
     Cell(String),
     Number(f64),
@@ -122,6 +122,8 @@ impl Token {
             
         }).collect::<Vec<Self>>()
     }
+    
+   
 
     /// Returns Result type of String (the value in a Token::Cell):
     pub fn get_cell(&self) -> String {
@@ -155,6 +157,8 @@ pub fn eval(item: &String, csv: &CSV) -> String {
         if tokens.is_empty() {
             return "#[TOKEN ERROR]".to_string();
         }
+        
+        let args = &tokens[1..tokens.len()].to_vec();
 
         // We match on the function type and evaluate it.
         // Every value returned from a funcion will be parsed to a String and returned.
@@ -163,28 +167,28 @@ pub fn eval(item: &String, csv: &CSV) -> String {
                 match f {
                     // SUM:
                     Functions::Sum  => {
-                        match func_sum(&csv, &tokens[1..tokens.len()]) {
+                        match func_sum(&csv, &args) {
                             Ok(n)    => return n.to_string(),
                             Err(err) => return err.to_string(),
                         }
                     },
                     // AVG:
                     Functions::Avg  => {
-                        match func_avg(&csv, &tokens[1..tokens.len()]) {
+                        match func_avg(&csv, &args){
                             Ok(n)    => return n.to_string(),
                             Err(err) => return err.to_string(),
                         }
                     },
                     // CALC:
                     Functions::Calc => {
-                        match func_calc(&csv, &tokens[1..tokens.len()]) {
+                        match func_calc(&csv, &args) {
                             Ok(n)    => return n.to_string(),
                             Err(err) => return err.to_string(),
                         }
                     },
                     // IF:
                     Functions::If   => {
-                        match func_if(&csv, &tokens[1..tokens.len()]) {
+                        match func_if(&csv, &args) {
                             Ok(val)  => return val,
                             Err(err) => return err.to_string(),
                         }
@@ -207,9 +211,8 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 /// --------------------     IF    --------------------
 /// ---------------------------------------------------
 
-fn func_if(_csv: &CSV, args: &[Token]) -> Result<String, CsvError> {
+fn func_if(_csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
     println!("[IF ARGS] {:?}", args);
-    
 
     Ok("astolfo".to_string())
 }
@@ -222,7 +225,7 @@ fn func_if(_csv: &CSV, args: &[Token]) -> Result<String, CsvError> {
 
 /// Evaluates a mathematical expression;
 /// It will turn the received arguments (which should be numbers, cells or binary operators) into postfix form;
-fn func_calc(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
+fn func_calc(csv: &CSV, args: &Vec<Token>) -> Result<f64, CsvError> {
     let postfix_args = infix_to_postfix(&csv, &args)?;
     //println!("[POSTFIX AGRS] {:?}", postfix_args);
 
@@ -274,7 +277,7 @@ fn func_calc(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
 /// Parses arguments into postfix form for `func_calc`:
 /// Iterates over the received arguments and forms a postfix expression from them;
 /// This way I don't have to deal with precedence checking;
-fn infix_to_postfix(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
+fn infix_to_postfix(csv: &CSV, args: &Vec<Token>) -> Result<Vec<Token>, CsvError> {
     //println!("[FROM POSTIX PARSER] {:?}", args);
 
     let mut postfix: Vec<Token> = Vec::new();
@@ -324,7 +327,7 @@ fn infix_to_postfix(csv: &CSV, args: &[Token]) -> Result<Vec<Token>, CsvError> {
 /// ---------------------------------------------------
 
 /// --- SUM FUNCTION:
-fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
+fn func_sum(csv: &CSV, args: &Vec<Token>) -> Result<f64, CsvError> {
     // Incorrect argument size:
     if args.len() != 2 {
         return Err(CsvError::ArgError);
@@ -350,7 +353,7 @@ fn func_sum(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
 /// --------------------    AVG    --------------------
 /// ---------------------------------------------------
 
-fn func_avg(csv: &CSV, args: &[Token]) -> Result<f64, CsvError> {
+fn func_avg(csv: &CSV, args: &Vec<Token>) -> Result<f64, CsvError> {
     // Incorrect argument size:
     if args.len() != 2 {
         return Err(CsvError::ArgError);
