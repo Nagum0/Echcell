@@ -34,10 +34,10 @@ pub fn func_caller(csv: &CSV, func: &Token, args: &Vec<Token>) -> Result<String,
 /// ---------------------------------------------------
 /// --------------------     IF    --------------------
 /// ---------------------------------------------------
-fn func_if(_csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
+fn func_if(csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
     println!("[IF ARGS] {:?}", args);
 
-    // Split condition and the rest:
+    // Split into 3 parts:
     let mut i = 0;
 
     let split_if = args.iter().fold(vec![vec![]], |mut acc, token| {
@@ -54,10 +54,40 @@ fn func_if(_csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
         }
         acc      
     });
-      
+    
     println!("[SPLIT IF] {:?}", split_if);
 
-    Ok("astolfo".to_string())
+    if split_if.len() != 3 {
+        return Err(CsvError::ArgError);
+    }
+    
+    // Checking the condition:
+    let cond_args = &split_if[0];
+    let cond_val = condition_eval(&csv, &cond_args)?;
+    let output;
+
+    if cond_val {
+        output = split_if[1].clone();
+    }
+    else {
+        output = split_if[2].clone();
+    }
+
+    if output.is_empty() {
+        return Err(CsvError::ArgError);
+    }
+
+    match &output[0] {
+        Token::Cell(val) => Ok(val.to_string()),
+        Token::Number(n) => Ok(n.to_string()),
+        Token::Func(_)   => func_caller(&csv, &output[0], &output[1..output.len()].to_vec()),
+        _ => Err(CsvError::ExprError("Wrong argument type...".to_string())),
+    }
+}
+
+#[allow(unused)]
+fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
+    Ok(true)
 }
 
 /// ---------------------------------------------------
