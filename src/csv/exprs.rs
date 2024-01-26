@@ -221,6 +221,10 @@ fn func_if(_csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
                 i += 1;
                 acc.push(Vec::new());
             },
+            Token::Else => {
+                i += 1;
+                acc.push(Vec::new());
+            },
             _ => acc[i].push(token.clone()),
         }
         acc      
