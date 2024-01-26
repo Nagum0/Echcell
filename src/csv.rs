@@ -6,6 +6,8 @@ use super::error::CsvError;
 mod exprs;
 use exprs::eval;
 
+mod funcs;
+
 #[derive(Debug)]
 pub struct CSV {
     pub file: String,
