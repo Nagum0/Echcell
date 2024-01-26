@@ -1,4 +1,2 @@
 A,B,C
 69,10,= IF A1 == 69 THEN 10 ELSE 420.3645
-,,= SUM A1 B1
-,= CALC 1 + A1 - 1,= AVG A1 B1

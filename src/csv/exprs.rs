@@ -1,5 +1,5 @@
 use crate::CSV;
-use super::funcs::func_caller;
+use crate::csv::funcs::func_caller;
 
 /// FUNCTIONS ENUM
 /// Every impletemnted function is found here.

@@ -1,12 +1,12 @@
+mod exprs;
+mod funcs;
+
 use std::fs;
 use std::io::Write;
 
-use super::error::CsvError;
-
-mod exprs;
+use crate::error::CsvError;
 use exprs::eval;
 
-mod funcs;
 
 #[derive(Debug)]
 pub struct CSV {

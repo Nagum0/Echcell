@@ -38,6 +38,8 @@ Misato Katsuragi,30,Female,NULL
 <b>AVG</b>: Takes in a range and returns their average;
 <br>
 <b>CALC</b>: Takes in any infix mathematical expression and evaluates it;
+<br>
+<b>IF</b>:  
 </details>
 
 ### CELL POINTERS
@@ -69,3 +71,24 @@ A1 B2
 - AVG Function - DONE
 - Mathematical expressions - DONE
 - IF function - Working on...
+
+### Defined functions:
+- **SUM**: Returns the sum of a given range;
+```
+= SUM <range>
+```
+- **AVG**: Returns the average of a given range;
+```
+= AVG <range>
+```
+- **CALC**: Calculates a mathematical expression;
+```
+= CALC <expr>
+```
+- **IF**: Is broken into 3 parts:
+    - *Condition*: Checks whether a condition is true or false;
+    - *If the condition is true*: Returns the element or expression after THEN;
+    - *If the condition is false*: Returns the element or expression after ELSE;
+```
+= IF 1 == 1 THEN SUM A1 A5 ELSE SUM B1 B5
+```

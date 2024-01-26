@@ -15,7 +15,6 @@ use crate::csv::exprs::{
 /// ---------------------------------------------------
 /// --------------------   Caller  --------------------
 /// ---------------------------------------------------
-
 /// This function receives a Func and arguments and calls the proper func_<name>.
 pub fn func_caller(csv: &CSV, func: &Token, args: &Vec<Token>) -> Result<String, CsvError> {
     // Check whether func is truly a function token:
@@ -35,14 +34,13 @@ pub fn func_caller(csv: &CSV, func: &Token, args: &Vec<Token>) -> Result<String,
 /// ---------------------------------------------------
 /// --------------------     IF    --------------------
 /// ---------------------------------------------------
-
 fn func_if(_csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
     println!("[IF ARGS] {:?}", args);
 
     // Split condition and the rest:
     let mut i = 0;
 
-    let condition_split = args.iter().fold(vec![vec![]], |mut acc, token| {
+    let split_if = args.iter().fold(vec![vec![]], |mut acc, token| {
         match token {
             Token::Then => {
                 i += 1;
@@ -57,9 +55,7 @@ fn func_if(_csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
         acc      
     });
       
-    println!("[CONDITION SPLIT] {:?}", condition_split);
-    // Testing out how to get functions inside ifs:
-    //println!("[TEST] {:?}", func_sum(&_csv, &condition_split[0][1..condition_split[0].len()].to_vec()));
+    println!("[SPLIT IF] {:?}", split_if);
 
     Ok("astolfo".to_string())
 }
@@ -67,7 +63,6 @@ fn func_if(_csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
 /// ---------------------------------------------------
 /// --------------------   CALC    --------------------
 /// ---------------------------------------------------
-
 /// Evaluates a mathematical expression;
 /// It will turn the received arguments (which should be numbers, cells or binary operators) into postfix form;
 fn func_calc(csv: &CSV, args: &Vec<Token>) -> Result<f64, CsvError> {
@@ -164,6 +159,10 @@ fn infix_to_postfix(csv: &CSV, args: &Vec<Token>) -> Result<Vec<Token>, CsvError
 
     Ok(postfix)
 }
+
+/// ---------------------------------------------------
+/// --------------------    AVG    --------------------
+/// ---------------------------------------------------
 fn func_sum(csv: &CSV, args: &Vec<Token>) -> Result<f64, CsvError> {
     // Incorrect argument size:
     if args.len() != 2 {
@@ -184,10 +183,10 @@ fn func_sum(csv: &CSV, args: &Vec<Token>) -> Result<f64, CsvError> {
         }
     })?)
 }
+
 /// ---------------------------------------------------
 /// --------------------    AVG    --------------------
 /// ---------------------------------------------------
-
 fn func_avg(csv: &CSV, args: &Vec<Token>) -> Result<f64, CsvError> {
     // Incorrect argument size:
     if args.len() != 2 {
