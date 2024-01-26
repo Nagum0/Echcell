@@ -1,3 +1,4 @@
+#![allow(unused)]
 use super::CSV;
 use super::super::error::CsvError;
 
@@ -148,7 +149,7 @@ pub fn eval(item: &String, csv: &CSV) -> String {
         // (First 2 elements are removed because they are the '= ')
         let expr: String = item[2..item.len()].to_string();
 
-        // Tokens:
+        // Tokens (tokenizing):
         let tokens = Token::tokenize(&expr);
         //println!("[TOKENS] {:?}", tokens);
         
@@ -156,44 +157,14 @@ pub fn eval(item: &String, csv: &CSV) -> String {
             return "#[TOKEN ERROR]".to_string();
         }
         
+        // Creating arguments vector:
         let args = &tokens[1..tokens.len()].to_vec();
-
-        // We match on the function type and evaluate it.
-        // Every value returned from a funcion will be parsed to a String and returned.
-        match &tokens[0] {
-            Token::Func(f) => {
-                match f {
-                    // SUM:
-                    Functions::Sum  => {
-                        match func_sum(&csv, &args) {
-                            Ok(n)    => return n.to_string(),
-                            Err(err) => return err.to_string(),
-                        }
-                    },
-                    // AVG:
-                    Functions::Avg  => {
-                        match func_avg(&csv, &args){
-                            Ok(n)    => return n.to_string(),
-                            Err(err) => return err.to_string(),
-                        }
-                    },
-                    // CALC:
-                    Functions::Calc => {
-                        match func_calc(&csv, &args) {
-                            Ok(n)    => return n.to_string(),
-                            Err(err) => return err.to_string(),
-                        }
-                    },
-                    // IF:
-                    Functions::If   => {
-                        match func_if(&csv, &args) {
-                            Ok(val)  => return val,
-                            Err(err) => return err.to_string(),
-                        }
-                    }
-                }
-            },
-            _ => return "#[UNKNOWN FUNCTION]".to_string(),
+        
+        // Caller function:
+        // (Evaluates the functions)
+        match func_caller(&csv, &tokens[0], &args) {
+            Ok(val)  => return val,
+            Err(err) => return err.to_string(),
         }
     }
     
@@ -204,6 +175,26 @@ pub fn eval(item: &String, csv: &CSV) -> String {
 /// ---------------------------------------------------
 /// -------------------- FUNCTIONS --------------------
 /// ---------------------------------------------------
+
+/// ---------------------------------------------------
+/// --------------------   Caller  --------------------
+/// ---------------------------------------------------
+
+/// This function receives a Func and arguments and calls the proper func_<name>.
+fn func_caller(csv: &CSV, func: &Token, args: &Vec<Token>) -> Result<String, CsvError> {
+    // Check whether func is truly a function token:
+    if let Token::Func(f) = func {
+        match f {
+            Functions::Sum  => Ok(func_sum(&csv, &args)?.to_string()),
+            Functions::Avg  => Ok(func_avg(&csv, &args)?.to_string()),
+            Functions::Calc => Ok(func_calc(&csv, &args)?.to_string()),
+            Functions::If   => Ok(func_if(&csv, &args)?),
+        }
+    }
+    else {
+        Err(CsvError::ExprError("Unknown function...".to_string()))
+    }
+}
 
 /// ---------------------------------------------------
 /// --------------------     IF    --------------------
@@ -236,8 +227,6 @@ fn func_if(_csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
 
     Ok("astolfo".to_string())
 }
-
-/// --------------------     IF    --------------------
 
 /// ---------------------------------------------------
 /// --------------------   CALC    --------------------
@@ -340,8 +329,6 @@ fn infix_to_postfix(csv: &CSV, args: &Vec<Token>) -> Result<Vec<Token>, CsvError
     Ok(postfix)
 }
 
-/// --------------------   CALC    --------------------
-
 /// ---------------------------------------------------
 /// --------------------    SUM    --------------------
 /// ---------------------------------------------------
@@ -367,7 +354,6 @@ fn func_sum(csv: &CSV, args: &Vec<Token>) -> Result<f64, CsvError> {
         }
     })?)
 }
-/// --------------------    SUM    --------------------
 
 /// ---------------------------------------------------
 /// --------------------    AVG    --------------------
@@ -388,4 +374,3 @@ fn func_avg(csv: &CSV, args: &Vec<Token>) -> Result<f64, CsvError> {
     Ok(sum / range_len as f64)
 }
 
-// --------------------    AVG    --------------------
