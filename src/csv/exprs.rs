@@ -229,7 +229,7 @@ fn func_if(_csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
         }
         acc      
     });
-   
+      
     println!("[CONDITION SPLIT] {:?}", condition_split);
     // Testing out how to get functions inside ifs:
     println!("[TEST] {:?}", func_sum(&_csv, &condition_split[0][1..condition_split[0].len()].to_vec()));
