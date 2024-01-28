@@ -27,21 +27,6 @@ Misato Katsuragi,30,Female,NULL
 = SUM A1 C1
 ```
 
-### FUNCTIONS
-- Every function takes in arguments.
-
-#### Defined functions:
-<details>
-<summary>More</summary>
-<b>SUM</b>: Takes in a range and returns their sum;
-<br>
-<b>AVG</b>: Takes in a range and returns their average;
-<br>
-<b>CALC</b>: Takes in any infix mathematical expression and evaluates it;
-<br>
-<b>IF</b>:  
-</details>
-
 ### CELL POINTERS
 - A **cell pointer** holds the x and y coordinates for a specific cell (it points to the cell's value);
 - The first character of a cell pointer is the column number (x coordinate) and the rest of the characters must be numbers representing the row number (y coordinate);
@@ -89,6 +74,7 @@ A1 B2
     - *Condition*: Checks whether a condition is true or false;
     - *If the condition is true*: Returns the element or expression after THEN;
     - *If the condition is false*: Returns the element or expression after ELSE;
+    - Currently condition checking only works on Number types;
 ```
 = IF 1 == 1 THEN SUM A1 A5 ELSE SUM B1 B5
 ```

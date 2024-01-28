@@ -45,32 +45,21 @@ impl BinaryOp {
 /// Mainly used in _IF functions.
 #[derive(Debug, Clone, Copy)]
 pub enum CmpOp {
-    Eq,
+    Eq, // ==
+    Gt, // >
 }
 
 #[allow(unused)]
 impl CmpOp {
     // Checks whether the given left and a right values are equal:
     pub fn eq(csv: &CSV, left: &Token, right: &Token) -> Result<bool, CsvError> {
-        match (left, right) {
-            // Same type cases:
-            (Token::Number(n), Token::Number(k)) => Ok(n == k),
-            (Token::Cell(c1), Token::Cell(c2)) => {
-                Ok(csv.get_cell_value(c1)? == csv.get_cell_value(c2)?)
-            },
-            // Case where there is a Cell and a Number:
-            (Token::Cell(cptr), Token::Number(n)) |
-            (Token::Number(n), Token::Cell(cptr)) => {
-                let cptr_val = match csv.get_cell_value(&cptr)?.parse::<f64>() {
-                    Ok(n)  => n,
-                    Err(_) => return Err(CsvError::ExprError("Uncomparable values...".to_string())),
-                };
-                println!("[CPTR VALUE] {:?}", cptr_val);
-                Ok(cptr_val == *n)
-            },
-            _ => Err(CsvError::ExprError("Uncomparable values...".to_string())),
-        }
+        todo!()
     } 
+    
+    // Checks whether the left value is greater than the right value:
+    pub fn gt(csv: &CSV, left: &Token, right: &Token) -> Result<bool, CsvError> {
+        todo!()
+    }
 }
 
 /// TOKEN ENUM
@@ -135,6 +124,9 @@ impl Token {
             // Comparison operators:
             else if word == "==" {
                 Self::CmpOperator(CmpOp::Eq)
+            }
+            else if word == ">" {
+                Self::CmpOperator(CmpOp::Gt)
             }
 
             // If the word is parsable to f64 then its a Number:

@@ -97,10 +97,49 @@ fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
     let left = &cond_args[0];
     let right = &cond_args[2];
     
+    // Parsing left and right:
+    // (Because currently ony Numer types can be compared)
+    let (l_val, r_val) = match (left, right) {
+        (Token::Number(n), Token::Number(k)) => (*n, *k),
+        (Token::Cell(c1), Token::Cell(c2))   => {
+            let n = match csv.get_cell_value(c1)?.parse::<f64>() {
+                Ok(n)  => n,
+                Err(_) => return Err(CsvError::ExprError("Uncomparable ypes...".to_string())),
+            };
+
+            let k = match csv.get_cell_value(c2)?.parse::<f64>() {
+                Ok(k)  => k,
+                Err(_) => return Err(CsvError::ExprError("Uncomparable ypes...".to_string())),
+            };
+            
+            (n.clone(), k.clone())
+        }, 
+        (Token::Number(n), Token::Cell(cptr)) => {
+            let k = match csv.get_cell_value(cptr)?.parse::<f64>() {
+                Ok(k)  => k,
+                Err(_) => return Err(CsvError::ExprError("Uncomparable ypes...".to_string())),
+            };
+
+            (*n, k.clone())
+        },
+        (Token::Cell(cptr), Token::Number(n)) => {
+            let k = match csv.get_cell_value(cptr)?.parse::<f64>() {
+                Ok(k)  => k,
+                Err(_) => return Err(CsvError::ExprError("Uncomparable ypes...".to_string())),
+            };
+
+            (k.clone(), *n)
+        },
+        _ => return Err(CsvError::ExprError("Uncomparable types...".to_string())),
+    };
+
+    println!("[LEFT] {:?}, [RIGHT] {:?}", l_val, r_val);
+
     // Comparing left and right:
     if let Token::CmpOperator(cmp) = op {
         match cmp {
             CmpOp::Eq => CmpOp::eq(&csv, &left, &right),
+            CmpOp::Gt => CmpOp::gt(&csv, &left, &right),
         } 
     }
     else {
