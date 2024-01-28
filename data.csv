@@ -1,2 +1,3 @@
 A,B,C
-69,69,= IF B1 == A1 THEN AVG A1 B1 ELSE SUM A1 B1
+69,10,= IF A2 == Astolfo THEN AVG A1 B1 ELSE SUM A1 B1
+Astolfo,45,lmao
