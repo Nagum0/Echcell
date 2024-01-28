@@ -35,7 +35,7 @@ pub fn func_caller(csv: &CSV, func: &Token, args: &Vec<Token>) -> Result<String,
 /// --------------------     IF    --------------------
 /// ---------------------------------------------------
 fn func_if(csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
-    println!("[IF ARGS] {:?}", args);
+    // println!("[IF ARGS] {:?}", args);
 
     // Split into 3 parts:
     let mut i = 0;
@@ -55,7 +55,7 @@ fn func_if(csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
         acc      
     });
     
-    println!("[SPLIT IF] {:?}", split_if);
+    // println!("[SPLIT IF] {:?}", split_if);
 
     if split_if.len() != 3 {
         return Err(CsvError::ArgError);
@@ -67,10 +67,10 @@ fn func_if(csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
     let output;
 
     if cond_val {
-        output = split_if[1].clone();
+        output = &split_if[1];
     }
     else {
-        output = split_if[2].clone();
+        output = &split_if[2];
     }
 
     if output.is_empty() {
@@ -87,7 +87,25 @@ fn func_if(csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
 
 #[allow(unused)]
 fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
-    Ok(true)
+    println!("[COND ARGS] {:?}", cond_args);
+
+    if cond_args.len() != 3 {
+        return Err(CsvError::ArgError);
+    }
+
+    let op = &cond_args[1];
+    let left = &cond_args[0];
+    let right = &cond_args[2];
+    
+    // Comparing left and right:
+    if let Token::CmpOperator(cmp) = op {
+        match cmp {
+            CmpOp::Eq => CmpOp::eq(&csv, &left, &right),
+        } 
+    }
+    else {
+        Err(CsvError::ExprError("Expected a comparison operator...".to_string()))
+    }
 }
 
 /// ---------------------------------------------------

@@ -1,3 +1,4 @@
+use crate::error::CsvError;
 use crate::CSV;
 use crate::csv::funcs::func_caller;
 
@@ -45,6 +46,33 @@ impl BinaryOp {
 #[derive(Debug, Clone, Copy)]
 pub enum CmpOp {
     Eq,
+}
+
+#[allow(unused)]
+impl CmpOp {
+    // Checks whether the given left and a right values are equal:
+    pub fn eq(csv: &CSV, left: &Token, right: &Token) -> Result<bool, CsvError> {
+        match (left, right) {
+            (Token::Number(n), Token::Number(k)) => Ok(n == k),
+            (Token::Cell(c1), Token::Cell(c2)) => Ok(c1 == c2),
+            (Token::Cell(cptr), Token::Number(n)) => {
+                let cptr_val = match csv.get_cell_value(&cptr)?.parse::<f64>() {
+                    Ok(n)  => n,
+                    Err(_) => return Err(CsvError::ExprError("Uncomparable values...".to_string())),
+                };
+                println!("[CPTR VALUE] {:?}", cptr_val);
+                Ok(cptr_val == *n)
+            },
+            (Token::Number(n), Token::Cell(cptr)) => {
+                 let cptr_val = match csv.get_cell_value(&cptr)?.parse::<f64>() {
+                    Ok(n)  => n,
+                    Err(_) => return Err(CsvError::ExprError("Uncomparable values...".to_string())),
+                };
+                Ok(cptr_val == *n)
+            },
+            _ => Err(CsvError::ExprError("Uncomparable values...".to_string())),
+        }
+    } 
 }
 
 /// TOKEN ENUM
