@@ -55,7 +55,8 @@ A1 B2
 - Custom error types - DONE
 - AVG Function - DONE
 - Mathematical expressions - DONE
-- IF function - Working on...
+- IF function - DONE
+- SUMIF function - Working on...
 
 ### Defined functions:
 - **SUM**: Returns the sum of a given range;
