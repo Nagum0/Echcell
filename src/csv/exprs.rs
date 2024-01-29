@@ -1,18 +1,7 @@
-use crate::CSV;
-use crate::csv::funcs::func_caller;
+use crate::csv::CSV;
+use super::funcs::func_caller;
 
-/// FUNCTIONS ENUM
-/// Every impletemnted function is found here.
-/// Calc => Mathematical expression (+,-,*,/);
-///         Evaluates a given mathematical expression.
-/// 
-/// Sum  => Returns the sum over a range of cells;
-///         It takes in 2 arguments the start of the range and the end of a range. 
-/// 
-/// Avg  => Returns the average of a range of cells;
-///         It takes in 2 arguments the start of the range ant the end of a range.
 #[derive(Debug, Clone, Copy)]
-#[allow(unused)]
 pub enum Functions {
     Calc,
     Sum,
@@ -41,7 +30,6 @@ impl BinaryOp {
 }
 
 /// COMPARISON OPERATORS
-/// Mainly used in _IF functions.
 #[derive(Debug, Clone, Copy)]
 pub enum CmpOp {
     Eq, // ==
@@ -51,7 +39,6 @@ pub enum CmpOp {
     Le, // <=
 }
 
-#[allow(unused)]
 impl CmpOp {
     // Checks whether the given left and a right values are equal:
     pub fn eq(left: f64, right: f64) -> bool { left == right } 
@@ -65,11 +52,6 @@ impl CmpOp {
     pub fn le(left: f64, right: f64) -> bool { left <= right }
 }
 
-/// TOKEN ENUM
-/// Cell     => Holds the value of a cell as a String from the csv body (can be a cell_ptr or a string of text);
-/// Func     => Represents a function with the `Functions` enum;
-/// Number   => A number (currently it is a f64);
-/// Operator => Holds a BinaryOp. Used for CALC function and other math expressions;
 #[derive(Debug, Clone)]
 pub enum Token {
     Cell(String),
@@ -85,8 +67,7 @@ pub enum Token {
 
 impl Token {
     /// Tokenizes the input expression.
-    /// Returns a vector of tokens.
-    pub fn tokenize(expr: &String) -> Vec<Self> {
+    fn tokenize(expr: &String) -> Vec<Self> {
         let split_expr: Vec<String> = expr.split_whitespace().map(String::from).collect();
         
         split_expr.iter().map(|word| {
