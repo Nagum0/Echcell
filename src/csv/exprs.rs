@@ -46,6 +46,9 @@ impl BinaryOp {
 pub enum CmpOp {
     Eq, // ==
     Gt, // >
+    Lt, // <
+    Ge, //>=
+    Le, // <=
 }
 
 #[allow(unused)]
@@ -54,6 +57,12 @@ impl CmpOp {
     pub fn eq(left: f64, right: f64) -> bool { left == right } 
     // Checks whether the left value is greater than the right value:
     pub fn gt(left: f64, right: f64) -> bool { left > right }
+    // Checks whether the left value is smaller than the right value:
+    pub fn lt(left: f64, right: f64) -> bool { left < right }
+    // Checks whether the left value is greater or equal than the right value:
+    pub fn ge(left: f64, right: f64) -> bool { left >= right }
+    // Checks whether the left value is smaller or eqal than the right value:
+    pub fn le(left: f64, right: f64) -> bool { left <= right }
 }
 
 /// TOKEN ENUM
@@ -121,6 +130,15 @@ impl Token {
             }
             else if word == ">" {
                 Self::CmpOperator(CmpOp::Gt)
+            }
+            else if word == "<" {
+                Self::CmpOperator(CmpOp::Lt)
+            }
+            else if word == ">=" {
+                Self::CmpOperator(CmpOp::Ge)
+            }
+            else if word == "<=" {
+                Self::CmpOperator(CmpOp::Le)
             }
 
             // If the word is parsable to f64 then its a Number:

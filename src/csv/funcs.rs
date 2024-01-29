@@ -106,6 +106,9 @@ fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
         match cmp {
             CmpOp::Eq => Ok(CmpOp::eq(l_val, r_val)),
             CmpOp::Gt => Ok(CmpOp::gt(l_val, r_val)),
+            CmpOp::Lt => Ok(CmpOp::lt(l_val, r_val)),
+            CmpOp::Ge => Ok(CmpOp::ge(l_val, r_val)),
+            CmpOp::Le => Ok(CmpOp::le(l_val, r_val)),
         } 
     }
     else {
