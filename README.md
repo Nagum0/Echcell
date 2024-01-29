@@ -50,14 +50,6 @@ A1 A5
 A1 B2
 ```
 
-# TODO!
-- SUM Function - DONE
-- Custom error types - DONE
-- AVG Function - DONE
-- Mathematical expressions - DONE
-- IF function - DONE
-- SUMIF function - Working on...
-
 ### Defined functions:
 - **SUM**: Returns the sum of a given range;
 ```
@@ -79,3 +71,11 @@ A1 B2
 ```
 = IF 1 == 1 THEN SUM A1 A5 ELSE SUM B1 B5
 ```
+
+# TODO!
+- SUM Function - DONE
+- Custom error types - DONE
+- AVG Function - DONE
+- Mathematical expressions - DONE
+- IF function - DONE
+- String support - Working on...

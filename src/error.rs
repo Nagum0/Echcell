@@ -8,6 +8,7 @@ pub enum CsvError {
     ExprError(String),
     RangeError(String),
     CellPError(String),
+    RunError(String),
 }
 
 impl fmt::Display for CsvError {
@@ -18,6 +19,7 @@ impl fmt::Display for CsvError {
             Self::ExprError(msg)  => write!(f, "#[EXPR ERROR] {}", msg),
             Self::RangeError(msg) => write!(f, "#[RANGE ERROR] {}", msg),
             Self::CellPError(msg) => write!(f, "#[CELL POINTER ERROR] {}", msg),
+            Self::RunError(msg)   => write!(f, "Error while running application!\n{}", msg),
         }
     }
 }
