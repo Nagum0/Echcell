@@ -1,4 +1,3 @@
-use crate::error::CsvError;
 use crate::CSV;
 use crate::csv::funcs::func_caller;
 
@@ -52,14 +51,9 @@ pub enum CmpOp {
 #[allow(unused)]
 impl CmpOp {
     // Checks whether the given left and a right values are equal:
-    pub fn eq(csv: &CSV, left: &Token, right: &Token) -> Result<bool, CsvError> {
-        todo!()
-    } 
-    
+    pub fn eq(left: f64, right: f64) -> bool { left == right } 
     // Checks whether the left value is greater than the right value:
-    pub fn gt(csv: &CSV, left: &Token, right: &Token) -> Result<bool, CsvError> {
-        todo!()
-    }
+    pub fn gt(left: f64, right: f64) -> bool { left > right }
 }
 
 /// TOKEN ENUM

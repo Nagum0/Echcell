@@ -78,14 +78,14 @@ fn func_if(csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
     }
 
     match &output[0] {
-        Token::Cell(val) => Ok(val.to_string()),
+        Token::Cell(val) => Ok(val.to_string()), // What if the cell contains a cell pointer?
         Token::Number(n) => Ok(n.to_string()),
         Token::Func(_)   => func_caller(&csv, &output[0], &output[1..output.len()].to_vec()),
         _ => Err(CsvError::ExprError("Wrong argument type...".to_string())),
     }
 }
 
-#[allow(unused)]
+// Evaluates whether a condition is true or false:
 fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
     println!("[COND ARGS] {:?}", cond_args);
 
@@ -97,10 +97,27 @@ fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
     let left = &cond_args[0];
     let right = &cond_args[2];
     
-    // Parsing left and right:
-    // (Because currently ony Numer types can be compared)
-    let (l_val, r_val) = match (left, right) {
-        (Token::Number(n), Token::Number(k)) => (*n, *k),
+    // Extracting the values from left and right:
+    let (l_val, r_val) = get_cmp_values(&csv, &left, &right)?;
+    println!("[LEFT] {:?}, [RIGHT] {:?}", l_val, r_val);
+
+    // Comparing left and right:
+    if let Token::CmpOperator(cmp) = op {
+        match cmp {
+            CmpOp::Eq => Ok(CmpOp::eq(l_val, r_val)),
+            CmpOp::Gt => Ok(CmpOp::gt(l_val, r_val)),
+        } 
+    }
+    else {
+        Err(CsvError::ExprError("Expected a comparison operator...".to_string()))
+    }
+}
+
+// Extracts the Numbers from the tokens or cell pointers:
+// Returns a CsvError if the tokens are not numbers or the cell pointers point to non number values;
+fn get_cmp_values(csv: &CSV, left: &Token, right: &Token) -> Result<(f64, f64), CsvError> {
+    match (left, right) {
+        (Token::Number(n), Token::Number(k)) => Ok((*n, *k)),
         (Token::Cell(c1), Token::Cell(c2))   => {
             let n = match csv.get_cell_value(c1)?.parse::<f64>() {
                 Ok(n)  => n,
@@ -111,8 +128,8 @@ fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
                 Ok(k)  => k,
                 Err(_) => return Err(CsvError::ExprError("Uncomparable ypes...".to_string())),
             };
-            
-            (n.clone(), k.clone())
+
+            Ok((n.clone(), k.clone()))
         }, 
         (Token::Number(n), Token::Cell(cptr)) => {
             let k = match csv.get_cell_value(cptr)?.parse::<f64>() {
@@ -120,7 +137,7 @@ fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
                 Err(_) => return Err(CsvError::ExprError("Uncomparable ypes...".to_string())),
             };
 
-            (*n, k.clone())
+            Ok((*n, k.clone()))
         },
         (Token::Cell(cptr), Token::Number(n)) => {
             let k = match csv.get_cell_value(cptr)?.parse::<f64>() {
@@ -128,22 +145,9 @@ fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
                 Err(_) => return Err(CsvError::ExprError("Uncomparable ypes...".to_string())),
             };
 
-            (k.clone(), *n)
+            Ok((k.clone(), *n))
         },
         _ => return Err(CsvError::ExprError("Uncomparable types...".to_string())),
-    };
-
-    println!("[LEFT] {:?}, [RIGHT] {:?}", l_val, r_val);
-
-    // Comparing left and right:
-    if let Token::CmpOperator(cmp) = op {
-        match cmp {
-            CmpOp::Eq => CmpOp::eq(&csv, &left, &right),
-            CmpOp::Gt => CmpOp::gt(&csv, &left, &right),
-        } 
-    }
-    else {
-        Err(CsvError::ExprError("Expected a comparison operator...".to_string()))
     }
 }
 
