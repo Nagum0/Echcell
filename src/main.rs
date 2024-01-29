@@ -1,11 +1,7 @@
-mod error;
-mod csv;
-
 use std::env;
-
-use error::CsvError;
-use csv::{
-    CSV, 
+use echcell::error::CsvError;
+use echcell::csv::{
+    CSV,
     generate_output,
 };
 

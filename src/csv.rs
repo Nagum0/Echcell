@@ -3,10 +3,8 @@ mod funcs;
 
 use std::fs;
 use std::io::Write;
-
 use crate::error::CsvError;
 use exprs::eval;
-
 
 #[derive(Debug)]
 pub struct CSV {
@@ -38,6 +36,13 @@ impl RangeType {
 }
 
 impl CSV {
+    /// Creates a new CSV object.
+    /// Returns a Result type of Self(CSV) or std::io::Error.
+    pub fn new(file_path: String) -> Result<Self, CsvError> {
+        let parsed_data = Self::parse(&file_path)?;
+        Ok(Self { file: file_path, header: parsed_data.0, body: parsed_data.1 })
+    }
+
     /// -- PRIVATE --
     /// CSV PARSER:
     /// Parses input into a tuple of Vec<String>(CSV header) and Vec<Vec<String>>(CSV body).
@@ -88,18 +93,9 @@ impl CSV {
         Ok(cor)
     }
 
-    /// -- PUBLIC --
-    /// Creates a new CSV object.
-    /// Returns a Result type of Self(CSV) or std::io::Error.
-    pub fn new(file_path: String) -> Result<Self, CsvError> {
-        let parsed_data = Self::parse(&file_path)?;
-        Ok(Self { file: file_path, header: parsed_data.0, body: parsed_data.1 })
-    }
-
     /// Returns a Result type of item (String. An item from the csv body.) or a CsvError with a specified error message.
     /// This function can be called on a CSV object and takes in a cell pointer in this format: "A1", "C2", ...
-    #[allow(unused)]
-    pub fn get_cell_value(&self, cell_pointer: &str) -> Result<String, CsvError> {
+    fn get_cell_value(&self, cell_pointer: &str) -> Result<String, CsvError> {
         // Getting the x coordinate:
         let x_cor = self.get_column_cor(cell_pointer)?;
         // Getting the y coordinate:
@@ -112,8 +108,7 @@ impl CSV {
     /// Receives 2 cell pointers a start of a range and an end of a range.
     /// The resulting vector of strings are the values of cells inside the given range.
     /// Either the column or row index must match on both cell pointers (ranges are either column base or row based; nothing diagonal).
-    #[allow(unused)]
-    pub fn get_range_values(&self, cell_pointer_start: &str, cell_pointer_end: &str) -> Result<Vec<String>, CsvError> {
+    fn get_range_values(&self, cell_pointer_start: &str, cell_pointer_end: &str) -> Result<Vec<String>, CsvError> {
         // Getting the coordinates:
         let x_start = self.get_column_cor(cell_pointer_start)?;
         let x_end = self.get_column_cor(cell_pointer_end)?;
@@ -134,14 +129,14 @@ impl CSV {
     
     /// Returns the length of a range.
     /// Makes use of the `get_range_values` function.
-    pub fn get_range_len(&self, cell_pointer_start: &str, cell_pointer_end: &str) -> Result<usize, CsvError> {
+    fn get_range_len(&self, cell_pointer_start: &str, cell_pointer_end: &str) -> Result<usize, CsvError> {
         Ok(Self::get_range_values(&self, cell_pointer_start, cell_pointer_end)?.len())
     }
 }
 
 /// Iterates over the created CSV object and evaluates all the expressions found and creates an output csv file.
 ///
-/// DOES NOT HANDLE INVALID EXPRESSIONS. (They will be parsed into the output file with a error message inside the corresponding cell).
+/// DOES NOT HANDLE INVALID EXPRESSIONS. (They will be parsed into the output file with an error message inside the corresponding cell).
 /// 
 /// Returns a Result type of () or CsvError if the file generation failed.
 pub fn generate_output(csv: &CSV) -> Result<(), CsvError> {
