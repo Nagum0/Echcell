@@ -1,10 +1,13 @@
+mod error;
+mod csv;
+
 use std::env;
 
-mod error;
 use error::CsvError;
-
-mod csv;
-use csv::{CSV, generate_output};
+use csv::{
+    CSV, 
+    generate_output,
+};
 
 fn main() -> Result<(), CsvError> {
     // Arguments:

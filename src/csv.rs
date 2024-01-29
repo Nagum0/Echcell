@@ -1,10 +1,12 @@
+mod exprs;
+mod funcs;
+
 use std::fs;
 use std::io::Write;
 
-use super::error::CsvError;
-
-mod exprs;
+use crate::error::CsvError;
 use exprs::eval;
+
 
 #[derive(Debug)]
 pub struct CSV {
@@ -157,7 +159,9 @@ pub fn generate_output(csv: &CSV) -> Result<(), CsvError> {
     
     // Writing the body and evaluating the expressions:
     csv.body.iter().try_for_each(|row| {
-        let buffer: String = row.iter().map(|item| eval(item, &csv)).collect::<Vec<_>>().join(",");
+        let buffer: String = row.iter()
+            .map(|item| eval(item, &csv))
+            .collect::<Vec<_>>().join(",");
         match writeln!(&mut output_file, "{}", buffer) {
             Ok(_)  => Ok(()),
             Err(_) => return Err(CsvError::FileError("Could not write to output file...".to_string())),
