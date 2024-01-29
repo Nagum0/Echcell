@@ -86,7 +86,7 @@ fn func_if(csv: &CSV, args: &Vec<Token>) -> Result<String, CsvError> {
 
 // Evaluates whether a condition is true or false:
 fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
-    println!("[COND ARGS] {:?}", cond_args);
+    // println!("[COND ARGS] {:?}", cond_args);
 
     if cond_args.len() != 3 {
         return Err(CsvError::ArgError);
@@ -98,7 +98,7 @@ fn condition_eval(csv: &CSV, cond_args: &Vec<Token>) -> Result<bool, CsvError> {
     
     // Extracting the values from left and right:
     let (l_val, r_val) = get_cmp_values(&csv, &left, &right)?;
-    println!("[LEFT] {:?}, [RIGHT] {:?}", l_val, r_val);
+    // println!("[LEFT] {:?}, [RIGHT] {:?}", l_val, r_val);
 
     // Comparing left and right:
     if let Token::CmpOperator(cmp) = op {
